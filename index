@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Город Снов</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Настройка основного шрифта для всей игры */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            touch-action: none; /* Отключаем стандартное поведение тач-событий (например, зум по двойному тапу) */
+        }
+
+        /* Основной контейнер приложения с фоном ночного города */
+        .app-container {
+            background: linear-gradient(180deg, #0d1a26 0%, #203a43 50%, #000000 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* "Туман" для атмосферы */
+        .app-container::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40%;
+            background: linear-gradient(to top, rgba(13, 26, 38, 0.7), transparent);
+            pointer-events: none;
+        }
+
+        /* Стили для кнопок в меню */
+        .menu-button {
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+        .menu-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(128, 90, 213, 0.5);
+        }
+        .menu-button:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Стили для игрового поля */
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            gap: 5px;
+            aspect-ratio: 1 / 1; /* Сохраняем поле квадратным */
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Базовый стиль "окна" */
+        .window {
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            background-color: rgba(0,0,0,0.2); /* Цвет "потухшего" окна */
+        }
+
+        /* Состояния окна */
+        .window.selected {
+            transform: scale(0.9);
+            outline: 3px solid #ffffff;
+            outline-offset: 2px;
+        }
+
+        /* --- Цвета и свечение для окон (светильники) --- */
+        /* Каждый цвет имеет основной фон и тень для эффекта свечения */
+        .window.color-1 {
+            background-color: #ff5252; /* Красный */
+            box-shadow: 0 0 12px #ff5252;
+        }
+        .window.color-2 {
+            background-color: #448aff; /* Синий */
+            box-shadow: 0 0 12px #448aff;
+        }
+        .window.color-3 {
+            background-color: #00e676; /* Зеленый */
+            box-shadow: 0 0 12px #00e676;
+        }
+        .window.color-4 {
+            background-color: #ffd740; /* Желтый */
+            box-shadow: 0 0 12px #ffd740;
+        }
+        .window.color-5 {
+            background-color: #ff4081; /* Розовый */
+            box-shadow: 0 0 12px #ff4081;
+        }
+        .window.color-6 {
+            background-color: #ab47bc; /* Фиолетовый */
+            box-shadow: 0 0 12px #ab47bc;
+        }
+
+        /* Анимация исчезновения */
+        .matched {
+            animation: disappear 0.5s forwards;
+        }
+
+        @keyframes disappear {
+            0% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900">
+
+    <div class="app-container w-full max-w-md mx-auto">
+        <!-- 1. Экран главного меню (виден по умолчанию) -->
+        <div id="menu-screen" class="text-center text-white w-full">
+            <h1 class="text-5xl font-bold mb-4" style="text-shadow: 0 0 15px rgba(255,255,255,0.5);">Город Снов</h1>
+            <p class="text-lg text-gray-300 mb-12">Собери сны одного цвета</p>
+            <div class="flex flex-col items-center space-y-5">
+                <button id="play-btn" class="menu-button w-3/4 bg-purple-600 text-white font-bold py-4 px-6 rounded-xl text-xl">ИГРАТЬ</button>
+                <button id="store-btn" class="menu-button w-3/4 bg-gray-700 text-white font-bold py-4 px-6 rounded-xl text-xl">МАГАЗИН</button>
+                <button id="stats-btn" class="menu-button w-3/4 bg-gray-700 text-white font-bold py-4 px-6 rounded-xl text-xl">СТАТИСТИКА</button>
+            </div>
+        </div>
+
+        <!-- 2. Игровой экран (скрыт по умолчанию) -->
+        <div id="game-screen" class="hidden w-full h-full flex flex-col">
+            <!-- Верхняя панель с очками и кнопкой "назад" -->
+            <div class="flex justify-between items-center mb-4 text-white p-2 bg-black bg-opacity-20 rounded-lg">
+                <button id="back-to-menu-btn" class="text-lg font-bold px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-20 transition">&larr; Меню</button>
+                <div class="text-right">
+                    <div class="text-2xl font-bold">Очки: <span id="score">0</span></div>
+                </div>
+            </div>
+            
+            <!-- Игровое поле -->
+            <div id="game-board" class="w-full">
+                <!-- Окна будут генерироваться здесь с помощью JavaScript -->
+            </div>
+        </div>
+
+        <!-- 3. Экран магазина (скрыт по умолчанию) -->
+        <div id="store-screen" class="hidden text-center text-white w-full">
+            <h2 class="text-4xl font-bold mb-8">Магазин</h2>
+            <p class="mb-8">Здесь можно будет выбирать скины для света из окон.</p>
+            <button class="back-btn menu-button w-3/4 bg-gray-700 text-white font-bold py-4 px-6 rounded-xl text-xl">НАЗАД</button>
+        </div>
+
+        <!-- 4. Экран статистики (скрыт по умолчанию) -->
+        <div id="stats-screen" class="hidden text-center text-white w-full">
+            <h2 class="text-4xl font-bold mb-8">Статистика</h2>
+            <p class="mb-8">Здесь будет отображаться ваш игровой прогресс.</p>
+            <button class="back-btn menu-button w-3/4 bg-gray-700 text-white font-bold py-4 px-6 rounded-xl text-xl">НАЗАД</button>
+        </div>
+    </div>
+
+    <script>
+        // Ждем, пока вся страница (HTML-структура) будет загружена
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- 1. Получаем все необходимые элементы ---
+            const screens = {
+                menu: document.getElementById('menu-screen'),
+                game: document.getElementById('game-screen'),
+                store: document.getElementById('store-screen'),
+                stats: document.getElementById('stats-screen'),
+            };
+
+            const buttons = {
+                play: document.getElementById('play-btn'),
+                store: document.getElementById('store-btn'),
+                stats: document.getElementById('stats-btn'),
+                backToMenu: document.getElementById('back-to-menu-btn'),
+                // Используем querySelectorAll, так как кнопок "НАЗАД" несколько
+                backBtns: document.querySelectorAll('.back-btn'),
+            };
+
+            // --- 2. Функция для переключения экранов ---
+            function showScreen(screenKey) {
+                // Сначала прячем все экраны
+                for (const key in screens) {
+                    screens[key].classList.add('hidden');
+                }
+                // Затем показываем нужный
+                screens[screenKey].classList.remove('hidden');
+            }
+
+            // --- 3. Назначаем обработчики событий на кнопки ---
+            buttons.play.addEventListener('click', () => {
+                showScreen('game');
+                // В будущем здесь будет начинаться игра
+            });
+
+            buttons.store.addEventListener('click', () => showScreen('store'));
+            buttons.stats.addEventListener('click', () => showScreen('stats'));
+            buttons.backToMenu.addEventListener('click', () => showScreen('menu'));
+
+            // Назначаем обработчик для всех кнопок "НАЗАД"
+            buttons.backBtns.forEach(btn => {
+                btn.addEventListener('click', () => showScreen('menu'));
+            });
+
+        });
+    </script>
+
+</body>
+</html>
+
