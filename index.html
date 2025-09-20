@@ -98,6 +98,15 @@
             outline: 3px solid #ffd740;
             box-shadow: 0 0 20px rgba(255, 215, 64, 0.6);
         }
+
+        /* Новый класс для активации фона на всем контейнере */
+        .app-container.game-active {
+            background: url('https://raw.githubusercontent.com/Poklontsevv/cityofdreams/main/background_ussr.png') center/cover no-repeat;
+        }
+
+        #game-screen {
+            /* Правила фона были перенесены в .app-container.game-active */
+        }
     </style>
 </head>
 <body class="bg-gray-900">
@@ -144,6 +153,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const appContainer = document.querySelector('.app-container'); // Находим главный контейнер
             const screens = { menu: document.getElementById('menu-screen'), game: document.getElementById('game-screen'), store: document.getElementById('store-screen'), stats: document.getElementById('stats-screen') };
             const buttons = { play: document.getElementById('play-btn'), store: document.getElementById('store-btn'), stats: document.getElementById('stats-btn'), backToMenu: document.getElementById('back-to-menu-btn'), backBtns: document.querySelectorAll('.back-btn') };
             const gameBoardElement = document.getElementById('game-board');
@@ -162,6 +172,13 @@
             function showScreen(screenKey) {
                 Object.values(screens).forEach(s => s.classList.add('hidden'));
                 screens[screenKey].classList.remove('hidden');
+                
+                // Переключаем класс фона на главном контейнере
+                if (screenKey === 'game') {
+                    appContainer.classList.add('game-active');
+                } else {
+                    appContainer.classList.remove('game-active');
+                }
             }
 
             buttons.play.addEventListener('click', () => { showScreen('game'); startGame(); });
@@ -313,6 +330,8 @@
     </script>
 </body>
 </html>
+
+
 
 
 
