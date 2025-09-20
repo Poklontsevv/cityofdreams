@@ -45,54 +45,59 @@
             transform: translateY(0);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
         }
+        
         #game-board {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
             grid-template-rows: repeat(8, 1fr);
-            gap: 5px;
+            gap: 8px;
             aspect-ratio: 1 / 1;
-            background-color: rgba(0, 0, 0, 0.3);
-            padding: 10px;
-            border-radius: 12px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
             position: relative;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIj4NCiAgICA8ZGVmcz4NCiAgICAgICAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4NCiAgICAgICAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiMzQTJBMzA7IiAvPg0KICAgICAgICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojMUMxNjE4OyIgLz4NCiAgICAgICAgPC9saW5lYXJHcmFkaWVudD4NCiAgICA8L2RlZnM+DQogICAgPHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiMyODIzMjUiIC8+DQogICAgPGcgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2dyYWQpIiBzdHJva2Utd2lkdGg9IjEuNSI+DQogICAgICAgIDxwYXRoIGQ9Ik0wIDI1IEwxMDAgMjUgTTUwIDAgTDUwIDI1IE0tNTAgNTAgTDUwIDUwIE0wIDUwIE0wIDc1IEwxMDAgNzUgTTUwIDUwIEw1MCA3NSBNMTUwIDEwMCBMMTAwIDEwMCBNMTAwIDc1IE01MCAxMDAgTDUwIDEyNSIgLz4NCiAgICA8L2c+DQo8L3N2Zz4=');
+            background-size: 50px 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 15px rgba(0,0,0,0.4);
+            border: 2px solid #1a1a1a;
         }
+
         .window {
             border-radius: 4px;
             cursor: pointer;
             transition: transform 0.2s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-            background-color: rgba(0,0,0,0.2);
             width: 100%;
             height: 100%;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.6); 
         }
+
         .window.selected {
             transform: scale(0.9);
             outline: 3px solid #ffffff;
             outline-offset: 2px;
         }
-        .window.color-1 { background-color: #ff5252; box-shadow: 0 0 12px #ff5252; }
-        .window.color-2 { background-color: #448aff; box-shadow: 0 0 12px #448aff; }
-        .window.color-3 { background-color: #00e676; box-shadow: 0 0 12px #00e676; }
-        .window.color-4 { background-color: #ffd740; box-shadow: 0 0 12px #ffd740; }
-        .window.color-5 { background-color: #ff4081; box-shadow: 0 0 12px #ff4081; }
-        .window.color-6 { background-color: #ab47bc; box-shadow: 0 0 12px #ab47bc; }
+        
+        /* --- Обновленные цвета --- */
+        .window.color-1 { background-color: #FF4E40; box-shadow: inset 0 0 5px rgba(0,0,0,0.6), 0 0 12px #FF4E40; }
+        .window.color-2 { background-color: #6F47D7; box-shadow: inset 0 0 5px rgba(0,0,0,0.6), 0 0 12px #6F47D7; }
+        .window.color-3 { background-color: #38E156; box-shadow: inset 0 0 5px rgba(0,0,0,0.6), 0 0 12px #38E156; }
+        .window.color-4 { background-color: #FFE973; box-shadow: inset 0 0 5px rgba(0,0,0,0.6), 0 0 12px #FFE973; }
+        .window.color-5 { background-color: #BFA930; box-shadow: inset 0 0 5px rgba(0,0,0,0.6), 0 0 12px #BFA930; }
+        
         .window.matched { animation: disappear 0.4s forwards; }
         @keyframes disappear { 0% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(0.5); opacity: 0; } }
 
-        /* --- Стили для скинов --- */
-        .skin-pulse .window.color-1 { animation: pulse-red 2s infinite ease-in-out; }
-        .skin-pulse .window.color-2 { animation: pulse-blue 2s infinite ease-in-out; }
-        .skin-pulse .window.color-3 { animation: pulse-green 2s infinite ease-in-out; }
-        .skin-pulse .window.color-4 { animation: pulse-yellow 2s infinite ease-in-out; }
-        .skin-pulse .window.color-5 { animation: pulse-pink 2s infinite ease-in-out; }
-        .skin-pulse .window.color-6 { animation: pulse-purple 2s infinite ease-in-out; }
+        /* --- Обновленные стили для скинов --- */
+        .skin-pulse .window.color-1 { animation: pulse-1 2s infinite ease-in-out; }
+        .skin-pulse .window.color-2 { animation: pulse-2 2s infinite ease-in-out; }
+        .skin-pulse .window.color-3 { animation: pulse-3 2s infinite ease-in-out; }
+        .skin-pulse .window.color-4 { animation: pulse-4 2s infinite ease-in-out; }
+        .skin-pulse .window.color-5 { animation: pulse-5 2s infinite ease-in-out; }
 
-        @keyframes pulse-red { 0%, 100% { box-shadow: 0 0 12px #ff5252; } 50% { box-shadow: 0 0 22px #ff5252, 0 0 30px #ff1111; } }
-        @keyframes pulse-blue { 0%, 100% { box-shadow: 0 0 12px #448aff; } 50% { box-shadow: 0 0 22px #448aff, 0 0 30px #0056ff; } }
-        @keyframes pulse-green { 0%, 100% { box-shadow: 0 0 12px #00e676; } 50% { box-shadow: 0 0 22px #00e676, 0 0 30px #00ff55; } }
-        @keyframes pulse-yellow { 0%, 100% { box-shadow: 0 0 12px #ffd740; } 50% { box-shadow: 0 0 22px #ffd740, 0 0 30px #ffcc00; } }
-        @keyframes pulse-pink { 0%, 100% { box-shadow: 0 0 12px #ff4081; } 50% { box-shadow: 0 0 22px #ff4081, 0 0 30px #ff0055; } }
-        @keyframes pulse-purple { 0%, 100% { box-shadow: 0 0 12px #ab47bc; } 50% { box-shadow: 0 0 22px #ab47bc, 0 0 30px #aa00ff; } }
+        @keyframes pulse-1 { 0%, 100% { box-shadow: inset 0 0 5px rgba(0,0,0,0.6), 0 0 12px #FF4E40; } 50% { box-shadow: inset 0 0 5px rgba(0,0,0,0.6), 0 0 22px #FF4E40, 0 0 30px #ff2211; } }
+        @keyframes pulse-2 { 0%, 100% { box-shadow: inset 0 0 5px rgba(0,0,0,0.6), 0 0 12px #6F47D7; } 50% { box-shadow: inset 0 0 5px rgba(0,0,0,0.6), 0 0 22px #6F47D7, 0 0 30px #582abd; } }
+        @keyframes pulse-3 { 0%, 100% { box-shadow: inset 0 0 5px rgba(0,0,0,0.6), 0 0 12px #38E156; } 50% { box-shadow: inset 0 0 5px rgba(0,0,0,0.6), 0 0 22px #38E156, 0 0 30px #1ddb3e; } }
+        @keyframes pulse-4 { 0%, 100% { box-shadow: inset 0 0 5px rgba(0,0,0,0.6), 0 0 12px #FFE973; } 50% { box-shadow: inset 0 0 5px rgba(0,0,0,0.6), 0 0 22px #FFE973, 0 0 30px #ffdf4c; } }
+        @keyframes pulse-5 { 0%, 100% { box-shadow: inset 0 0 5px rgba(0,0,0,0.6), 0 0 12px #BFA930; } 50% { box-shadow: inset 0 0 5px rgba(0,0,0,0.6), 0 0 22px #BFA930, 0 0 30px #a6912a; } }
         
         .skin-btn.active {
             outline: 3px solid #ffd740;
@@ -103,7 +108,7 @@
 <body class="bg-gray-900">
 
     <div class="app-container w-full max-w-md mx-auto">
-        <!-- 1. Экран главного меню -->
+        <!-- Screens -->
         <div id="menu-screen" class="text-center text-white w-full">
             <h1 class="text-5xl font-bold mb-4" style="text-shadow: 0 0 15px rgba(255,255,255,0.5);">Город Снов</h1>
             <p class="text-lg text-gray-300 mb-12">Собери сны одного цвета</p>
@@ -113,8 +118,6 @@
                 <button id="stats-btn" class="menu-button w-3/4 bg-gray-700 text-white font-bold py-4 px-6 rounded-xl text-xl">СТАТИСТИКА</button>
             </div>
         </div>
-
-        <!-- 2. Игровой экран -->
         <div id="game-screen" class="hidden w-full h-full flex flex-col">
             <div class="flex justify-between items-center mb-4 text-white p-2 bg-black bg-opacity-20 rounded-lg">
                 <button id="back-to-menu-btn" class="text-lg font-bold px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-20 transition">&larr; Меню</button>
@@ -124,8 +127,6 @@
             </div>
             <div id="game-board" class="w-full"></div>
         </div>
-
-        <!-- 3. Экран магазина -->
         <div id="store-screen" class="hidden text-center text-white w-full">
             <h2 class="text-4xl font-bold mb-8">Магазин</h2>
             <p class="mb-6 text-gray-300">Выберите стиль свечения окон</p>
@@ -135,8 +136,6 @@
             </div>
             <button class="back-btn menu-button w-3/4 bg-gray-700 text-white font-bold py-4 px-6 rounded-xl text-xl">НАЗАД</button>
         </div>
-
-        <!-- 4. Экран статистики -->
         <div id="stats-screen" class="hidden text-center text-white w-full">
             <h2 class="text-4xl font-bold mb-8">Статистика</h2>
             <div class="space-y-4 text-xl mb-8 bg-black bg-opacity-20 p-6 rounded-lg">
@@ -149,8 +148,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            
-            // --- Elements ---
             const screens = { menu: document.getElementById('menu-screen'), game: document.getElementById('game-screen'), store: document.getElementById('store-screen'), stats: document.getElementById('stats-screen') };
             const buttons = { play: document.getElementById('play-btn'), store: document.getElementById('store-btn'), stats: document.getElementById('stats-btn'), backToMenu: document.getElementById('back-to-menu-btn'), backBtns: document.querySelectorAll('.back-btn') };
             const gameBoardElement = document.getElementById('game-board');
@@ -158,37 +155,24 @@
             const highScoreElement = document.getElementById('high-score');
             const gamesPlayedElement = document.getElementById('games-played');
             const skinSelectionContainer = document.getElementById('skin-selection');
-
-            // --- Game Constants & State ---
-            const BOARD_SIZE = 8, NUM_COLORS = 6, STORAGE_KEY = 'dreamCityMatch3Data';
+            
+            // --- Обновленное количество цветов ---
+            const BOARD_SIZE = 8, NUM_COLORS = 5, STORAGE_KEY = 'dreamCityMatch3Data';
+            
             let board = [], score = 0, selectedWindow = null, isProcessing = false;
             let gameData = { highScore: 0, gamesPlayed: 0, currentSkin: 'default' };
-
-            // --- Initialization ---
+            
             loadData();
 
-            // --- Screen Navigation & Event Listeners ---
             function showScreen(screenKey) {
                 Object.values(screens).forEach(s => s.classList.add('hidden'));
                 screens[screenKey].classList.remove('hidden');
             }
 
-            buttons.play.addEventListener('click', () => {
-                showScreen('game');
-                startGame();
-            });
-            buttons.store.addEventListener('click', () => {
-                updateStoreScreen();
-                showScreen('store');
-            });
-            buttons.stats.addEventListener('click', () => {
-                updateStatsScreen();
-                showScreen('stats');
-            });
-            buttons.backToMenu.addEventListener('click', () => {
-                endGame();
-                showScreen('menu');
-            });
+            buttons.play.addEventListener('click', () => { showScreen('game'); startGame(); });
+            buttons.store.addEventListener('click', () => { updateStoreScreen(); showScreen('store'); });
+            buttons.stats.addEventListener('click', () => { updateStatsScreen(); showScreen('stats'); });
+            buttons.backToMenu.addEventListener('click', () => { endGame(); showScreen('menu'); });
             buttons.backBtns.forEach(btn => btn.addEventListener('click', () => showScreen('menu')));
             skinSelectionContainer.addEventListener('click', (e) => {
                 if (e.target.classList.contains('skin-btn')) {
@@ -199,10 +183,7 @@
                 }
             });
 
-            // --- Data Persistence ---
-            function saveData() {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(gameData));
-            }
+            function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(gameData)); }
             function loadData() {
                 const data = localStorage.getItem(STORAGE_KEY);
                 if (data) gameData = JSON.parse(data);
@@ -218,8 +199,6 @@
                     btn.classList.toggle('active', btn.dataset.skin === gameData.currentSkin);
                 });
             }
-
-            // --- Core Game Flow ---
             function startGame() {
                 score = 0;
                 updateScore();
@@ -233,18 +212,14 @@
                 gameData.gamesPlayed++;
                 saveData();
             }
-
             function createBoard() {
-                // ... (вся логика createBoard, createWindow, handleWindowClick, и т.д. остается без изменений) ...
                 gameBoardElement.innerHTML = '';
                 board = [];
                 for (let r = 0; r < BOARD_SIZE; r++) {
                     board[r] = [];
                     for (let c = 0; c < BOARD_SIZE; c++) {
                         let randomColor;
-                        do {
-                            randomColor = Math.floor(Math.random() * NUM_COLORS) + 1;
-                        } while ((c >= 2 && board[r][c-1] === randomColor && board[r][c-2] === randomColor) || (r >= 2 && board[r-1][c] === randomColor && board[r-2][c] === randomColor));
+                        do { randomColor = Math.floor(Math.random() * NUM_COLORS) + 1; } while ((c >= 2 && board[r][c-1] === randomColor && board[r][c-2] === randomColor) || (r >= 2 && board[r-1][c] === randomColor && board[r-2][c] === randomColor));
                         board[r][c] = randomColor;
                         createWindow(r, c, randomColor);
                     }
@@ -266,18 +241,8 @@
                     selectedWindow.classList.add('selected');
                 } else {
                     const r1 = parseInt(selectedWindow.dataset.r), c1 = parseInt(selectedWindow.dataset.c), r2 = parseInt(clickedWindow.dataset.r), c2 = parseInt(clickedWindow.dataset.c);
-                    if (r1 === r2 && c1 === c2) {
-                        selectedWindow.classList.remove('selected');
-                        selectedWindow = null;
-                        return;
-                    }
-                    if (Math.abs(r1 - r2) + Math.abs(c1 - c2) === 1) {
-                        await swapAndCheck(selectedWindow, clickedWindow);
-                    } else {
-                        selectedWindow.classList.remove('selected');
-                        selectedWindow = clickedWindow;
-                        selectedWindow.classList.add('selected');
-                    }
+                    if (r1 === r2 && c1 === c2) { selectedWindow.classList.remove('selected'); selectedWindow = null; return; }
+                    if (Math.abs(r1 - r2) + Math.abs(c1 - c2) === 1) { await swapAndCheck(selectedWindow, clickedWindow); } else { selectedWindow.classList.remove('selected'); selectedWindow = clickedWindow; selectedWindow.classList.add('selected'); }
                 }
             }
             async function swapAndCheck(win1, win2) {
@@ -287,7 +252,7 @@
                 await swapWindows(win1, win2);
                 const matches = findMatches();
                 if (matches.length > 0) await processMatches();
-                else await swapWindows(win1, win2); // Swap back
+                else await swapWindows(win1, win2);
                 isProcessing = false;
             }
             async function processMatches() {
@@ -336,8 +301,6 @@
                     }
                 }
             }
-            
-            // --- Helper & Visual Functions ---
             function getWindow(r, c) { return document.querySelector(`[data-r="${r}"][data-c="${c}"]`); }
             async function swapWindows(win1, win2) {
                 const r1 = parseInt(win1.dataset.r), c1 = parseInt(win1.dataset.c), r2 = parseInt(win2.dataset.r), c2 = parseInt(win2.dataset.c);
@@ -347,9 +310,7 @@
             }
             function applySkin() {
                 gameBoardElement.classList.remove('skin-pulse');
-                if (gameData.currentSkin === 'pulse') {
-                    gameBoardElement.classList.add('skin-pulse');
-                }
+                if (gameData.currentSkin === 'pulse') gameBoardElement.classList.add('skin-pulse');
             }
             function updateScore() { scoreElement.textContent = score; }
             function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
