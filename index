@@ -64,14 +64,17 @@
             padding: 10px;
             border-radius: 12px;
             border: 2px solid rgba(255, 255, 255, 0.1);
+            position: relative; /* For animations */
         }
 
         /* Базовый стиль "окна" */
         .window {
             border-radius: 4px;
             cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            transition: transform 0.2s ease, box-shadow 0.3s ease, background-color 0.3s ease;
             background-color: rgba(0,0,0,0.2); /* Цвет "потухшего" окна */
+            width: 100%;
+            height: 100%;
         }
 
         /* Состояния окна */
@@ -82,47 +85,23 @@
         }
 
         /* --- Цвета и свечение для окон (светильники) --- */
-        /* Каждый цвет имеет основной фон и тень для эффекта свечения */
-        .window.color-1 {
-            background-color: #ff5252; /* Красный */
-            box-shadow: 0 0 12px #ff5252;
-        }
-        .window.color-2 {
-            background-color: #448aff; /* Синий */
-            box-shadow: 0 0 12px #448aff;
-        }
-        .window.color-3 {
-            background-color: #00e676; /* Зеленый */
-            box-shadow: 0 0 12px #00e676;
-        }
-        .window.color-4 {
-            background-color: #ffd740; /* Желтый */
-            box-shadow: 0 0 12px #ffd740;
-        }
-        .window.color-5 {
-            background-color: #ff4081; /* Розовый */
-            box-shadow: 0 0 12px #ff4081;
-        }
-        .window.color-6 {
-            background-color: #ab47bc; /* Фиолетовый */
-            box-shadow: 0 0 12px #ab47bc;
-        }
+        .window.color-1 { background-color: #ff5252; box-shadow: 0 0 12px #ff5252; }
+        .window.color-2 { background-color: #448aff; box-shadow: 0 0 12px #448aff; }
+        .window.color-3 { background-color: #00e676; box-shadow: 0 0 12px #00e676; }
+        .window.color-4 { background-color: #ffd740; box-shadow: 0 0 12px #ffd740; }
+        .window.color-5 { background-color: #ff4081; box-shadow: 0 0 12px #ff4081; }
+        .window.color-6 { background-color: #ab47bc; box-shadow: 0 0 12px #ab47bc; }
 
         /* Анимация исчезновения */
-        .matched {
-            animation: disappear 0.5s forwards;
+        .window.matched {
+            animation: disappear 0.4s forwards;
+        }
+        
+        @keyframes disappear {
+            0% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(0.5); opacity: 0; }
         }
 
-        @keyframes disappear {
-            0% {
-                transform: scale(1.1);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(0);
-                opacity: 0;
-            }
-        }
     </style>
 </head>
 <body class="bg-gray-900">
@@ -141,18 +120,13 @@
 
         <!-- 2. Игровой экран (скрыт по умолчанию) -->
         <div id="game-screen" class="hidden w-full h-full flex flex-col">
-            <!-- Верхняя панель с очками и кнопкой "назад" -->
             <div class="flex justify-between items-center mb-4 text-white p-2 bg-black bg-opacity-20 rounded-lg">
                 <button id="back-to-menu-btn" class="text-lg font-bold px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-20 transition">&larr; Меню</button>
                 <div class="text-right">
                     <div class="text-2xl font-bold">Очки: <span id="score">0</span></div>
                 </div>
             </div>
-            
-            <!-- Игровое поле -->
-            <div id="game-board" class="w-full">
-                <!-- Окна будут генерироваться здесь с помощью JavaScript -->
-            </div>
+            <div id="game-board" class="w-full"></div>
         </div>
 
         <!-- 3. Экран магазина (скрыт по умолчанию) -->
@@ -171,54 +145,263 @@
     </div>
 
     <script>
-        // Ждем, пока вся страница (HTML-структура) будет загружена
         document.addEventListener('DOMContentLoaded', () => {
             
-            // --- 1. Получаем все необходимые элементы ---
+            // --- Elements and Screens ---
             const screens = {
                 menu: document.getElementById('menu-screen'),
                 game: document.getElementById('game-screen'),
                 store: document.getElementById('store-screen'),
                 stats: document.getElementById('stats-screen'),
             };
-
             const buttons = {
                 play: document.getElementById('play-btn'),
                 store: document.getElementById('store-btn'),
                 stats: document.getElementById('stats-btn'),
                 backToMenu: document.getElementById('back-to-menu-btn'),
-                // Используем querySelectorAll, так как кнопок "НАЗАД" несколько
                 backBtns: document.querySelectorAll('.back-btn'),
             };
+            const gameBoardElement = document.getElementById('game-board');
+            const scoreElement = document.getElementById('score');
 
-            // --- 2. Функция для переключения экранов ---
+            // --- Game Constants ---
+            const BOARD_SIZE = 8;
+            const NUM_COLORS = 6;
+
+            // --- Game State ---
+            let board = []; // 2D array holding color numbers
+            let score = 0;
+            let selectedWindow = null;
+            let isProcessing = false; // Prevents clicks during animations
+
+            // --- Screen Navigation ---
             function showScreen(screenKey) {
-                // Сначала прячем все экраны
                 for (const key in screens) {
                     screens[key].classList.add('hidden');
                 }
-                // Затем показываем нужный
                 screens[screenKey].classList.remove('hidden');
             }
 
-            // --- 3. Назначаем обработчики событий на кнопки ---
             buttons.play.addEventListener('click', () => {
                 showScreen('game');
-                // В будущем здесь будет начинаться игра
+                startGame();
             });
-
             buttons.store.addEventListener('click', () => showScreen('store'));
             buttons.stats.addEventListener('click', () => showScreen('stats'));
             buttons.backToMenu.addEventListener('click', () => showScreen('menu'));
+            buttons.backBtns.forEach(btn => btn.addEventListener('click', () => showScreen('menu')));
 
-            // Назначаем обработчик для всех кнопок "НАЗАД"
-            buttons.backBtns.forEach(btn => {
-                btn.addEventListener('click', () => showScreen('menu'));
-            });
+            // --- Game Logic ---
 
+            function startGame() {
+                score = 0;
+                updateScore();
+                isProcessing = false;
+                selectedWindow = null;
+                createBoard();
+            }
+
+            function createBoard() {
+                gameBoardElement.innerHTML = '';
+                board = [];
+                for (let r = 0; r < BOARD_SIZE; r++) {
+                    board[r] = [];
+                    for (let c = 0; c < BOARD_SIZE; c++) {
+                        let randomColor;
+                        // Prevent initial matches
+                        do {
+                            randomColor = Math.floor(Math.random() * NUM_COLORS) + 1;
+                        } while (
+                            (c >= 2 && board[r][c-1] === randomColor && board[r][c-2] === randomColor) ||
+                            (r >= 2 && board[r-1][c] === randomColor && board[r-2][c] === randomColor)
+                        );
+                        board[r][c] = randomColor;
+                        createWindow(r, c, randomColor);
+                    }
+                }
+            }
+            
+            function createWindow(r, c, color) {
+                const windowEl = document.createElement('div');
+                windowEl.classList.add('window', `color-${color}`);
+                windowEl.dataset.r = r;
+                windowEl.dataset.c = c;
+                windowEl.addEventListener('pointerdown', handleWindowClick);
+                gameBoardElement.appendChild(windowEl);
+            }
+
+            function handleWindowClick(event) {
+                if (isProcessing) return;
+                const clickedWindow = event.target;
+                
+                if (!selectedWindow) {
+                    selectedWindow = clickedWindow;
+                    selectedWindow.classList.add('selected');
+                } else {
+                    const r1 = parseInt(selectedWindow.dataset.r);
+                    const c1 = parseInt(selectedWindow.dataset.c);
+                    const r2 = parseInt(clickedWindow.dataset.r);
+                    const c2 = parseInt(clickedWindow.dataset.c);
+
+                    // Deselect if clicked the same window
+                    if (r1 === r2 && c1 === c2) {
+                        selectedWindow.classList.remove('selected');
+                        selectedWindow = null;
+                        return;
+                    }
+                    
+                    // Check for adjacency
+                    const isAdjacent = Math.abs(r1 - r2) + Math.abs(c1 - c2) === 1;
+                    
+                    if (isAdjacent) {
+                        swapAndCheck(selectedWindow, clickedWindow);
+                    } else {
+                        // If not adjacent, select the new one
+                        selectedWindow.classList.remove('selected');
+                        selectedWindow = clickedWindow;
+                        selectedWindow.classList.add('selected');
+                    }
+                }
+            }
+
+            async function swapAndCheck(win1, win2) {
+                isProcessing = true;
+                selectedWindow.classList.remove('selected');
+                selectedWindow = null;
+                
+                await swapWindows(win1, win2);
+                
+                const matches = findMatches();
+                if (matches.length > 0) {
+                    await processMatches();
+                } else {
+                    // Invalid move, swap back
+                    await sleep(100);
+                    await swapWindows(win1, win2);
+                }
+                isProcessing = false;
+            }
+
+            async function processMatches() {
+                let matches = findMatches();
+                while(matches.length > 0) {
+                    score += matches.length * 10;
+                    updateScore();
+                    
+                    await removeMatches(matches);
+                    await sleep(200); // Wait for fall animation
+                    await dropWindows();
+                    await fillWindows();
+                    matches = findMatches();
+                }
+            }
+
+            function findMatches() {
+                const matches = new Set();
+                // Horizontal
+                for (let r = 0; r < BOARD_SIZE; r++) {
+                    for (let c = 0; c < BOARD_SIZE - 2; c++) {
+                        if (board[r][c] && board[r][c] === board[r][c+1] && board[r][c] === board[r][c+2]) {
+                            matches.add(`${r}-${c}`);
+                            matches.add(`${r}-${c+1}`);
+                            matches.add(`${r}-${c+2}`);
+                        }
+                    }
+                }
+                // Vertical
+                for (let c = 0; c < BOARD_SIZE; c++) {
+                    for (let r = 0; r < BOARD_SIZE - 2; r++) {
+                         if (board[r][c] && board[r][c] === board[r+1][c] && board[r][c] === board[r+2][c]) {
+                            matches.add(`${r}-${c}`);
+                            matches.add(`${r+1}-${c}`);
+                            matches.add(`${r+2}-${c}`);
+                        }
+                    }
+                }
+                return Array.from(matches).map(id => document.querySelector(`[data-r="${id.split('-')[0]}"][data-c="${id.split('-')[1]}"]`));
+            }
+
+            async function removeMatches(matchedWindows) {
+                for (const win of matchedWindows) {
+                    if(!win) continue;
+                    const r = parseInt(win.dataset.r);
+                    const c = parseInt(win.dataset.c);
+                    board[r][c] = 0; // Mark as empty
+                    win.classList.add('matched');
+                }
+                await sleep(400); // Animation duration
+            }
+            
+            async function dropWindows() {
+                for (let c = 0; c < BOARD_SIZE; c++) {
+                    let writeRow = BOARD_SIZE - 1;
+                    for (let r = BOARD_SIZE - 1; r >= 0; r--) {
+                        if (board[r][c] !== 0) {
+                            if (writeRow !== r) {
+                                board[writeRow][c] = board[r][c];
+                                board[r][c] = 0;
+                            }
+                            writeRow--;
+                        }
+                    }
+                }
+                // Update DOM after calculating all drops
+                for (let r = 0; r < BOARD_SIZE; r++) {
+                    for (let c = 0; c < BOARD_SIZE; c++) {
+                        const color = board[r][c];
+                        const win = getWindow(r, c);
+                        if (color === 0) {
+                             win.className = 'window';
+                        } else {
+                            win.className = `window color-${color}`;
+                        }
+                    }
+                }
+            }
+            
+            async function fillWindows() {
+                for (let r = 0; r < BOARD_SIZE; r++) {
+                    for (let c = 0; c < BOARD_SIZE; c++) {
+                        if (board[r][c] === 0) {
+                           const newColor = Math.floor(Math.random() * NUM_COLORS) + 1;
+                           board[r][c] = newColor;
+                           const win = getWindow(r,c);
+                           win.className = `window color-${newColor}`;
+                        }
+                    }
+                }
+            }
+            
+            // --- Helper Functions ---
+            function getWindow(r, c) {
+                return document.querySelector(`[data-r="${r}"][data-c="${c}"]`);
+            }
+            
+            function swapWindows(win1, win2) {
+                const r1 = parseInt(win1.dataset.r), c1 = parseInt(win1.dataset.c);
+                const r2 = parseInt(win2.dataset.r), c2 = parseInt(win2.dataset.c);
+                
+                // Swap in the board array
+                [board[r1][c1], board[r2][c2]] = [board[r2][c2], board[r1][c1]];
+                
+                // Swap classes in DOM
+                const class1 = win1.className;
+                const class2 = win2.className;
+                win1.className = class2;
+                win2.className = class1;
+
+                return sleep(100); // Small delay to visualize swap
+            }
+
+            function updateScore() {
+                scoreElement.textContent = score;
+            }
+
+            function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
         });
     </script>
-
 </body>
 </html>
 
